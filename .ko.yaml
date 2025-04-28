@@ -1,0 +1,37 @@
+builds:
+  - id: headscale
+    main: ./cmd/headscale
+    mod_timestamp: "{{ .CommitTimestamp }}"
+    env:
+      - CGO_ENABLED=0
+    targets:
+      - darwin_amd64
+      - darwin_arm64
+      - freebsd_amd64
+      - linux_386
+      - linux_amd64
+      - linux_arm64
+      - linux_arm_5
+      - linux_arm_6
+      - linux_arm_7
+    flags:
+      - -mod=readonly
+    ldflags:
+      - -s -w
+      - -X github.com/juanfont/headscale/hscontrol/types.Version={{ .Git.Tag }}
+      - -X github.com/juanfont/headscale/hscontrol/types.GitCommitHash={{ .Git.ShortCommit }}
+    tags:
+      - ts2019
+      - "{{ if not .Prerelease }}latest-debug{{ end }}"
+      - "{{ if not .Prerelease }}{{ .Major }}.{{ .Minor }}.{{ .Patch }}-debug{{ end }}"
+      - "{{ if not .Prerelease }}{{ .Major }}.{{ .Minor }}-debug{{ end }}"
+      - "{{ if not .Prerelease }}{{ .Major }}-debug{{ end }}"
+      - "{{ if not .Prerelease }}v{{ .Major }}.{{ .Minor }}.{{ .Patch }}-debug{{ end }}"
+      - "{{ if not .Prerelease }}v{{ .Major }}.{{ .Minor }}-debug{{ end }}"
+      - "{{ if not .Prerelease }}v{{ .Major }}-debug{{ end }}"
+      - "{{ if not .Prerelease }}stable-debug{{ else }}unstable-debug{{ end }}"
+      - "{{ .Tag }}-debug"
+      - '{{ trimprefix .Tag "v" }}-debug'
+      - "sha-{{ .ShortCommit }}-debug"
+
+defaultBaseImage: gcr.io/distroless/base-debian12:debug
